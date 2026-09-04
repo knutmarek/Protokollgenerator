@@ -1,7 +1,7 @@
 {
   "name": "Grieseler Protokoll-Generator",
   "short_name": "Protokolle",
-  "description": "Protokoll-Generator der Grieseler GmbH – Raumluftmessung, Schimmelpilz, Feststoff, Beweissicherung.",
+  "description": "Protokoll-Generator der Grieseler GmbH – Raumluftmessung (VDI 3492, PAK, PCB, Schimmelpilz) und Feststoff nach LAGA PN 98.",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",

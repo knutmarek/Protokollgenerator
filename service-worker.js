@@ -1,5 +1,5 @@
 // ====== Cache-Version. Bei jeder Aktualisierung der App diese Zahl erhöhen! ======
-const CACHE = 'protokolle-v2';
+const CACHE = 'protokolle-v4';
 
 const ASSETS = [
   'index.html',
