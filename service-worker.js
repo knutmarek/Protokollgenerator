@@ -1,12 +1,12 @@
 // ====== Cache-Version. Bei jeder Aktualisierung der App diese Zahl erhöhen! ======
-const CACHE = 'protokolle-v4';
+const CACHE = 'protokolle-v2';
 
 const ASSETS = [
   'index.html',
   'manifest.json',
-  'icon180.png',
-  'icon192.png',
-  'icon512.png'
+  'icon-180.png',
+  'icon-192.png',
+  'icon-512.png'
 ];
 
 // Beim Installieren: alle Dateien in den Offline-Speicher legen
