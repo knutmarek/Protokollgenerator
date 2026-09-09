@@ -137,6 +137,10 @@
   .traum .ttag label{ font-weight:bold; font-size:13px; }
   .traum .tname{ border:0; border-bottom:1px solid var(--line); font-weight:bold; font-size:13px; width:190px; padding:1px 2px; background:transparent; }
   .traum .tname:focus{ outline:none; border-bottom:2px solid var(--accent); }
+  .mess-text{ align-items:flex-end; }
+  .mess input.longfield{ flex:1; min-width:0; border:0; border-bottom:1px solid var(--line); font:inherit; font-size:12.5px; padding:2px; background:transparent; }
+  .mess input.longfield:focus{ outline:none; border-bottom:2px solid var(--accent); }
+  .traum .tname.longfield{ width:auto; }
   .traum .rm{ background:#fff; border:1px solid #b33; color:#b33; border-radius:6px; font-size:12px; padding:3px 9px; cursor:pointer; }
   .traum .lbl-w{ min-width:210px; }
   .addmini{ font-size:12.5px; font-weight:bold; padding:5px 11px; border:1.5px dashed var(--accent); background:#fff; color:var(--accent); border-radius:7px; cursor:pointer; margin-top:8px; }
@@ -198,7 +202,20 @@
     input.fill[readonly]{ background:transparent; }
     .photo-drop{ border:1px solid #999; }
     .photo-drop .ph-hint{ color:#999; }
+    /* Textareas: voller Inhalt, kein Scrollbalken, kein Abschnitt */
+    textarea.fill{ height:auto !important; min-height:0 !important; overflow:visible !important; white-space:pre-wrap; word-break:break-word; }
+    /* Print-Spiegelung einzeiliger Textfelder: Input weg, umbrechendes Echo sichtbar */
+    input.print-mirror-hidden{ display:none !important; }
+    .print-echo{
+      display:inline-block; vertical-align:bottom;
+      flex:1; min-width:0; max-width:100%;
+      font:inherit; font-size:12.5px; padding:2px 2px 1px;
+      border-bottom:1px solid #000;
+      white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;
+    }
   }
+  /* Echo nur im Druck sichtbar */
+  .print-echo{ display:none; }
 </style>
 </head>
 <body>
@@ -771,17 +788,27 @@
 <template id="traum-tpl">
   <div class="traum">
     <div class="thead">
-      <span class="ttag"><label>Treppenraum</label><input class="tname" value="Treppenhaus 1"></span>
+      <span class="ttag"><label class="tlabel">Treppenraum 1</label></span>
       <button type="button" class="rm no-print">Entfernen</button>
     </div>
 
     <h4 class="sec">Übersicht</h4>
+    <div class="fotos ufotos"></div>
+    <button type="button" class="addmini addFoto no-print" data-ziel="ufotos">+ Übersichtsfoto</button>
+
+    <h4 class="sec">Angaben zum Treppenraum</h4>
+    <div class="mess mess-text">
+      <label class="mlab">Bezeichnung Treppenraum</label>
+      <input class="tname longfield" type="text" placeholder="z. B. Bauteil A, Bücherausgabe">
+    </div>
+    <div class="mess mess-text">
+      <label class="mlab">Etagen</label>
+      <input class="w-etagen longfield" type="text" placeholder="z. B. UG, EG, 1.–3. OG">
+    </div>
     <div class="mess">
       <label class="mlab">Nutzbare Laufbreite</label>
       <input class="wert w-breite" type="number" step="1" inputmode="decimal"><span class="einheit">cm</span>
     </div>
-    <div class="fotos ufotos"></div>
-    <button type="button" class="addmini addFoto no-print" data-ziel="ufotos">+ Übersichtsfoto</button>
 
     <h4 class="sec">Geländer</h4>
     <div class="mess" data-k="absturz">
@@ -1301,8 +1328,9 @@
       : '<span class="tag ok">i. O.</span>';
   }
 
-  function trFotoKachel(){
+  function trFotoKachel(caption){
     var n=tfotoTpl.content.firstElementChild.cloneNode(true);
+    if(caption){ var bu=n.querySelector('.bu'); bu.value=caption; bu.setAttribute('value',caption); }
     wireFotoKachel(n); return n;
   }
   function wireFotoKachel(n){
@@ -1437,14 +1465,16 @@
 
   function trNummeriereRaeume(){
     var blocks=traeumeEl.querySelectorAll('.traum');
-    blocks.forEach(function(b){ b.querySelector('.rm').style.display=(blocks.length>1)?'inline-block':'none'; });
+    blocks.forEach(function(b,i){
+      b.querySelector('.rm').style.display=(blocks.length>1)?'inline-block':'none';
+      var lab=b.querySelector('.tlabel'); if(lab) lab.textContent='Treppenraum '+(i+1);
+    });
   }
   function addTraum(){
     var n=traumTpl.content.firstElementChild.cloneNode(true);
-    var nr=traeumeEl.querySelectorAll('.traum').length+1;
-    n.querySelector('.tname').value='Treppenhaus '+nr;
-    n.querySelector('.tname').setAttribute('value','Treppenhaus '+nr);
-    n.querySelector('.ufotos').appendChild(trFotoKachel());
+    var uf=n.querySelector('.ufotos');
+    uf.appendChild(trFotoKachel('Lage'));
+    uf.appendChild(trFotoKachel('Übersicht'));
     wireTraum(n);
     traeumeEl.appendChild(n);
     bewerteTraum(n); trNummeriereRaeume();
@@ -1553,6 +1583,7 @@
         raum_id:pid+'-TR'+nr,
         nummer:nr,
         name:q('.tname').value||null,
+        etagen:q('.w-etagen')?(q('.w-etagen').value||null):null,
         laufbreite_cm:trZahl(q('.w-breite')),
         absturzhoehe_m:wert('[data-k="absturz"]'),
         gelaenderhoehe_cm:wert('[data-k="hoehe"]'),
@@ -1647,7 +1678,55 @@
     startEl.style.display='block'; backBtn.style.display='none'; printBtn.style.display='none'; saveBtn.style.display='none';
     document.getElementById('jsonBtn').style.display='none'; document.getElementById('fotoBtn').style.display='none'; window.scrollTo(0,0);
   });
-  printBtn.addEventListener('click', function(){ window.print(); });
+  /* ---------- Print-Spiegelung: einzeilige Textfelder brechen im Druck um ---------- */
+  function printEchoSelector(el){
+    // nur Text-Eingaben, keine Datumsfelder/Zahlen/Selects/Checkboxen
+    if(el.tagName!=='INPUT') return false;
+    var t=(el.getAttribute('type')||'text').toLowerCase();
+    return (t==='text' || t===''); 
+  }
+  function buildPrintEchos(){
+    document.querySelectorAll('.print-echo').forEach(function(s){ s.remove(); });
+    document.querySelectorAll('input.print-mirror-hidden').forEach(function(i){ i.classList.remove('print-mirror-hidden'); });
+    document.querySelectorAll('input').forEach(function(el){
+      if(!printEchoSelector(el)) return;
+      var val=el.value||'';
+      var span=document.createElement('span');
+      span.className='print-echo';
+      span.textContent=val;
+      el.insertAdjacentElement('afterend', span);
+      el.classList.add('print-mirror-hidden');
+    });
+  }
+  function clearPrintEchos(){
+    document.querySelectorAll('.print-echo').forEach(function(s){ s.remove(); });
+    document.querySelectorAll('input.print-mirror-hidden').forEach(function(i){ i.classList.remove('print-mirror-hidden'); });
+  }
+
+  /* ---------- Auto-Grow für mehrzeilige Felder ---------- */
+  function autoGrow(el){
+    if(!el || el.tagName!=='TEXTAREA') return;
+    el.style.height='auto';
+    el.style.height=(el.scrollHeight)+'px';
+  }
+  function autoGrowAll(){
+    document.querySelectorAll('textarea').forEach(autoGrow);
+  }
+  document.addEventListener('input', function(e){
+    if(e.target && e.target.tagName==='TEXTAREA') autoGrow(e.target);
+  });
+  // vor jedem Druck/Export alle Felder auf vollen Inhalt bringen
+  window.addEventListener('beforeprint', function(){
+    autoGrowAll();
+    buildPrintEchos();
+    document.body.classList.add('printing');
+  });
+  window.addEventListener('afterprint', function(){
+    document.body.classList.remove('printing');
+    clearPrintEchos();
+  });
+
+  printBtn.addEventListener('click', function(){ autoGrowAll(); window.print(); });
 
   /* ---------- Vorbefuellte Datei speichern ---------- */
   var saveBtn=document.getElementById('saveBtn');
@@ -1683,6 +1762,7 @@
   wireExistingSchaeden();
   buildGwTable();
   wireExistingTraeume();
+  autoGrowAll();
   (function(){
     var ao=document.body.getAttribute('data-autoopen');
     if(ao){ showForm(ao); }
