@@ -16,6 +16,7 @@
   html,body{ margin:0; padding:0; font-family:Arial,"Liberation Sans",sans-serif; color:var(--ink); background:var(--bg); }
   .toolbar{ position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:12px; background:var(--accent); color:#fff; padding:8px 14px; }
   .toolbar .tb-title{ font-weight:bold; flex:1; }
+  .toolbar .appver{ font-weight:normal; font-size:11px; opacity:.8; margin-left:6px; }
   .toolbar button{ font-size:14px; padding:7px 12px; border:0; border-radius:6px; cursor:pointer; background:#fff; color:var(--accent); font-weight:bold; }
   .toolbar button.ghost{ background:transparent; color:#fff; border:1px solid #fff; }
   .screen{ max-width:860px; margin:18px auto; }
@@ -202,16 +203,18 @@
     input.fill[readonly]{ background:transparent; }
     .photo-drop{ border:1px solid #999; }
     .photo-drop .ph-hint{ color:#999; }
-    /* Textareas: voller Inhalt, kein Scrollbalken, kein Abschnitt */
-    textarea.fill{ height:auto !important; min-height:0 !important; overflow:visible !important; white-space:pre-wrap; word-break:break-word; }
-    /* Print-Spiegelung einzeiliger Textfelder: Input weg, umbrechendes Echo sichtbar */
-    input.print-mirror-hidden{ display:none !important; }
+    /* Einzeilige Textfelder + Textareas werden im Druck durch Echos ersetzt */
+    input.print-mirror-hidden, textarea.print-mirror-hidden{ display:none !important; }
     .print-echo{
-      display:inline-block; vertical-align:bottom;
+      display:inline-block !important; vertical-align:bottom;
       flex:1; min-width:0; max-width:100%;
       font:inherit; font-size:12.5px; padding:2px 2px 1px;
       border-bottom:1px solid #000;
       white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;
+    }
+    .print-echo-ta{
+      display:block !important; width:100%; flex:1 1 100%;
+      border-bottom:1px solid #000; min-height:1.2em;
     }
   }
   /* Echo nur im Druck sichtbar */
@@ -222,10 +225,10 @@
 
 <div class="toolbar no-print">
   <button id="backBtn" class="ghost" style="display:none">&larr; Auswahl</button>
-  <span class="tb-title">Grieseler · Protokoll-Generator</span>
+  <span class="tb-title">Grieseler · Protokoll-Generator <span class="appver">v5 · 2026-09-28</span></span>
+  <button id="newBtn" class="ghost" style="display:none">Neues Protokoll</button>
   <button id="saveBtn" style="display:none">Vorbefüllte Datei speichern</button>
   <button id="jsonBtn" class="ghost" style="display:none">Daten (JSON)</button>
-  <button id="fotoBtn" class="ghost" style="display:none">Fotos speichern</button>
   <button id="printBtn" style="display:none">Als PDF drucken / speichern</button>
 </div>
 
@@ -257,16 +260,13 @@
       <h3>Feststoff / Material (LAGA PN 98)</h3>
       <p>Probenahmeprotokoll Feststoff/Material mit Eigenschaften, Probenahme-Angaben und LAGA-Probentabelle.</p>
     </button>
-    <button class="card" data-proto="beweis">
-      <h3>Beweissicherung / Schadensdokumentation</h3>
-      <p>Fotodokumentation mit Schadensbeschreibung. Beliebig viele Positionen (+ Button), automatisch fortlaufend nummeriert.</p>
-    </button>
     <button class="card" data-proto="treppe">
       <h3>Pr&uuml;fprotokoll Treppengel&auml;nder</h3>
       <p>Absturzsicherung an Treppen nach DIN 18065, Arbeitsst&auml;ttenrichtlinie oder DGUV. Beliebig viele Treppenr&auml;ume (+ Button), automatische Mangelbewertung, JSON-Export.</p>
     </button>
   </div>
   <p class="hint">Weitere Protokolltypen können hier später ergänzt werden.</p>
+  <p class="hint">App-Version v5 · 2026-09-28</p>
 </div>
 
 <!-- ===================== RAUMLUFT VDI 3492 ===================== -->
@@ -279,16 +279,27 @@
   <p class="subtitle">Bestimmung der Anzahlkonzentration anorganischer faserförmiger Partikel in der Innenraumluft</p>
   <div class="grid2">
     <div>
-      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Ort, Postleitzahl:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Projekt-Ort:</label><input class="fill"></div>
+      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill hk-ag-name"></div>
+      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-ag-strasse"></div>
+      <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-ag-ort"></div>
+      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill hk-projnr"></div>
     </div>
     <div>
       <div class="frow"><label class="lbl-w">Datum:</label><input type="date" class="fill" style="max-width:180px"></div>
       <div class="frow"><label class="lbl-w">Uhrzeit:</label><input type="time" class="fill" style="max-width:140px"></div>
       <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
+    </div>
+  </div>
+  <div class="headsub">
+    <div class="cap">Messobjekt</div>
+    <div class="grid2">
+      <div>
+        <div class="frow"><label class="lbl-w">Objekt / Bezeichnung:</label><input class="fill hk-obj-name"></div>
+        <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-obj-strasse"></div>
+      </div>
+      <div>
+        <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-obj-ort"></div>
+      </div>
     </div>
   </div>
   <div class="headsub">
@@ -323,16 +334,27 @@
   <p class="subtitle">Bestimmung polyzyklischer aromatischer Kohlenwasserstoffe (PAK) in der Innenraumluft</p>
   <div class="grid2">
     <div>
-      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Ort, Postleitzahl:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Projekt-Ort:</label><input class="fill"></div>
+      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill hk-ag-name"></div>
+      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-ag-strasse"></div>
+      <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-ag-ort"></div>
+      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill hk-projnr"></div>
     </div>
     <div>
       <div class="frow"><label class="lbl-w">Datum:</label><input type="date" class="fill" style="max-width:180px"></div>
       <div class="frow"><label class="lbl-w">Uhrzeit:</label><input type="time" class="fill" style="max-width:140px"></div>
       <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
+    </div>
+  </div>
+  <div class="headsub">
+    <div class="cap">Messobjekt</div>
+    <div class="grid2">
+      <div>
+        <div class="frow"><label class="lbl-w">Objekt / Bezeichnung:</label><input class="fill hk-obj-name"></div>
+        <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-obj-strasse"></div>
+      </div>
+      <div>
+        <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-obj-ort"></div>
+      </div>
     </div>
   </div>
   <div class="headsub">
@@ -365,16 +387,27 @@
   <p class="subtitle">Bestimmung polychlorierter Biphenyle (PCB) in der Innenraumluft</p>
   <div class="grid2">
     <div>
-      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Ort, Postleitzahl:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Projekt-Ort:</label><input class="fill"></div>
+      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill hk-ag-name"></div>
+      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-ag-strasse"></div>
+      <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-ag-ort"></div>
+      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill hk-projnr"></div>
     </div>
     <div>
       <div class="frow"><label class="lbl-w">Datum:</label><input type="date" class="fill" style="max-width:180px"></div>
       <div class="frow"><label class="lbl-w">Uhrzeit:</label><input type="time" class="fill" style="max-width:140px"></div>
       <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
+    </div>
+  </div>
+  <div class="headsub">
+    <div class="cap">Messobjekt</div>
+    <div class="grid2">
+      <div>
+        <div class="frow"><label class="lbl-w">Objekt / Bezeichnung:</label><input class="fill hk-obj-name"></div>
+        <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-obj-strasse"></div>
+      </div>
+      <div>
+        <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-obj-ort"></div>
+      </div>
     </div>
   </div>
   <div class="headsub">
@@ -407,16 +440,27 @@
   <p class="subtitle">Luftkeimsammlung (MEA / DG18) und Partikelspur zur Bestimmung von Schimmelpilzen in der Innenraumluft</p>
   <div class="grid2">
     <div>
-      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Ort, Postleitzahl:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Projekt-Ort:</label><input class="fill"></div>
+      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill hk-ag-name"></div>
+      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-ag-strasse"></div>
+      <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-ag-ort"></div>
+      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill hk-projnr"></div>
     </div>
     <div>
       <div class="frow"><label class="lbl-w">Datum:</label><input type="date" class="fill" style="max-width:180px"></div>
       <div class="frow"><label class="lbl-w">Uhrzeit:</label><input type="time" class="fill" style="max-width:140px"></div>
       <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
+    </div>
+  </div>
+  <div class="headsub">
+    <div class="cap">Messobjekt</div>
+    <div class="grid2">
+      <div>
+        <div class="frow"><label class="lbl-w">Objekt / Bezeichnung:</label><input class="fill hk-obj-name"></div>
+        <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-obj-strasse"></div>
+      </div>
+      <div>
+        <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-obj-ort"></div>
+      </div>
     </div>
   </div>
   <div class="headsub">
@@ -612,36 +656,6 @@
   </div>
   <div class="sign">
     <div class="frow"><label class="lbl-w">Probenehmer (Unterschrift):</label><input class="fill"></div>
-  </div>
-</div>
-
-<!-- ===================== BEWEISSICHERUNG / SCHADENSDOKUMENTATION ===================== -->
-<div id="form-beweis" class="screen sheet form" style="display:none">
-  <div class="brief">
-    <span class="firma">Grieseler GmbH</span><span>Mengeder Schulstr. 4, 44359 Dortmund</span>
-    <span>Tel. 0231 - 99 20 78 0</span><span>info@grieseler-gmbh.de</span>
-  </div>
-  <h1 class="title">Beweissicherung / Schadensdokumentation</h1>
-  <p class="subtitle">Fotodokumentation mit Schadensbeschreibung</p>
-  <div class="grid2">
-    <div>
-      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Objekt / Adresse:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Bauvorhaben:</label><input class="fill"></div>
-    </div>
-    <div>
-      <div class="frow"><label class="lbl-w">Auftragsnummer:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Bearbeiter:</label><input class="fill"></div>
-      <div class="frow"><label class="lbl-w">Datum (Anlage):</label><input type="date" class="fill" style="max-width:180px"></div>
-    </div>
-  </div>
-  <div id="schaeden"></div>
-  <div class="addbar no-print">
-    <button id="addSchaden" type="button">+ Position hinzufügen</button>
-    <div class="hint">Foto auswählen oder mit der Kamera aufnehmen. Positionen werden automatisch fortlaufend nummeriert.</div>
-  </div>
-  <div class="sign">
-    <div class="frow"><label class="lbl-w">Bearbeiter (Unterschrift):</label><input class="fill"></div>
   </div>
 </div>
 
@@ -910,57 +924,6 @@
   </div>
 </template>
 
-<!-- Vorlage eines Schaden-Blocks (Beweissicherung) -->
-<template id="schaden-tpl">
-  <div class="schaden">
-    <div class="shead">
-      <span class="stag"><label>Pos.</label><span class="snum">1</span></span>
-      <button type="button" class="rm no-print">Entfernen</button>
-    </div>
-
-    <div class="phase">
-      <div class="plabel">Erstbegutachtung (vor Baumaßnahme)</div>
-      <div class="sbody">
-        <div class="photo">
-          <label class="photo-drop">
-            <input type="file" accept="image/*" class="fileinp no-print" style="display:none">
-            <img class="shot" alt="">
-            <span class="ph-hint">📷 Foto auswählen<br>oder aufnehmen</span>
-          </label>
-        </div>
-        <div class="sfields">
-          <div class="frow"><label class="lbl-w">Ort / Raum:</label><input class="fill ortsrc"></div>
-          <div class="frow"><label class="lbl-w">Datum/Uhrzeit:</label><input type="datetime-local" class="fill" style="max-width:220px"></div>
-          <div class="frow" style="align-items:flex-start"><label class="lbl-w" style="padding-top:4px">Schaden:</label><textarea class="fill" placeholder="Beschreibung des vorhandenen Schadens …"></textarea></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="phase">
-      <div class="plabel">Nachbegutachtung (nach Baumaßnahme)</div>
-      <div class="sbody">
-        <div class="photo">
-          <label class="photo-drop">
-            <input type="file" accept="image/*" class="fileinp no-print" style="display:none">
-            <img class="shot" alt="">
-            <span class="ph-hint">📷 Foto auswählen<br>oder aufnehmen</span>
-          </label>
-        </div>
-        <div class="sfields">
-          <div class="frow"><label class="lbl-w">Ort / Raum:</label><input class="fill ortdst" readonly placeholder="(wie oben)"></div>
-          <div class="frow"><label class="lbl-w">Datum/Uhrzeit:</label><input type="datetime-local" class="fill" style="max-width:220px"></div>
-          <div class="bewertung">
-            <label class="cb"><input type="checkbox" class="bw" data-bw="keine"> Es sind keine Veränderungen zu verzeichnen.</label>
-            <label class="cb"><input type="checkbox" class="bw" data-bw="veraendert"> Es sind folgende Veränderungen zu verzeichnen:</label>
-            <textarea class="fill bw-text" placeholder="Beschreibung der Veränderungen …"></textarea>
-            <label class="cb"><input type="checkbox" class="bw" data-bw="neu"> Es ist ein neuer Mangel entstanden.</label>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <!-- Vorlage eines Probenblocks (Raumluft) -->
 <template id="probe-tpl">
   <div class="probe">
@@ -969,9 +932,9 @@
       <button type="button" class="rm no-print">Entfernen</button>
     </div>
     <div class="frow"><label class="lbl-w">Entnahmeort / Etage / Bereich:</label><input class="fill"></div>
-    <div class="frow"><label class="lbl-w">Gerätetyp:</label><input class="fill">
+    <div class="frow"><label class="lbl-w">Gerätetyp:</label><input class="fill" value="BPP 4-8 LA">
       <label>Geräte-Nr.:</label><input class="fill" style="max-width:150px"></div>
-    <div class="frow"><label class="lbl-w">Meßkopfnummer:</label><input class="fill"></div>
+    <div class="frow"><label class="lbl-w">Meßkopfnummer:</label><input class="fill" value="E "></div>
     <div class="frow"><label class="lbl-w">Volumenstrom:</label><input class="fill vstrom" value="8 l/min" style="max-width:120px">
       <label>Dauer Messung:</label><input class="fill dauer" value="8 h" style="max-width:110px"></div>
     <div class="frow"><label class="lbl-w">Probevolumen (autom.):</label><input class="fill pvol" readonly></div>
@@ -1063,7 +1026,6 @@
                    pcb: document.getElementById('form-pcb'),
                    schimmel: document.getElementById('form-schimmel'),
                    feststoff: document.getElementById('form-feststoff'),
-                   beweis: document.getElementById('form-beweis'),
                    treppe: document.getElementById('form-treppe') };
 
   /* ---------- Raumluft / PAK / PCB: Probenbloecke (gemeinsame Logik) ---------- */
@@ -1187,45 +1149,6 @@
              count:function(){ return msEl.querySelectorAll('.messgruppe').length; } };
   })();
 
-  /* ---------- Beweissicherung: Schaden-Bloecke ---------- */
-  var schaedenEl = document.getElementById('schaeden');
-  var schadenTpl = document.getElementById('schaden-tpl');
-  function renumberSchaeden(){
-    var blocks=schaedenEl.querySelectorAll('.schaden');
-    blocks.forEach(function(b,i){ b.querySelector('.snum').textContent=(i+1); });
-    blocks.forEach(function(b){ b.querySelector('.rm').style.display=(blocks.length>1)?'inline-block':'none'; });
-  }
-  function loadPhoto(input){
-    var file=input.files && input.files[0];
-    if(!file) return;
-    var drop=input.closest('.photo-drop');
-    var img=drop.querySelector('img.shot');
-    var rd=new FileReader();
-    rd.onload=function(e){ img.src=e.target.result; img.setAttribute('src',e.target.result); drop.classList.add('has-img'); };
-    rd.readAsDataURL(file);
-  }
-  function wireSchaden(node){
-    node.querySelector('.rm').addEventListener('click', function(){ node.remove(); renumberSchaeden(); });
-    node.querySelectorAll('.fileinp').forEach(function(inp){ inp.addEventListener('change', function(){ loadPhoto(this); }); });
-    var src=node.querySelector('.ortsrc'), dst=node.querySelector('.ortdst');
-    if(src&&dst){ src.addEventListener('input', function(){ dst.value=src.value; dst.setAttribute('value', src.value); }); }
-    var bws=node.querySelectorAll('.bw');
-    var bwBox=node.querySelector('.bewertung');
-    bws.forEach(function(cb){ cb.addEventListener('change', function(){
-      if(cb.checked){ bws.forEach(function(o){ if(o!==cb) o.checked=false; }); }
-      if(bwBox) bwBox.classList.toggle('bw-on-veraendert', node.querySelector('.bw[data-bw="veraendert"]').checked);
-    }); });
-  }
-  function addSchaden(){
-    var node=schadenTpl.content.firstElementChild.cloneNode(true);
-    wireSchaden(node);
-    schaedenEl.appendChild(node); renumberSchaeden();
-  }
-  function wireExistingSchaeden(){ schaedenEl.querySelectorAll('.schaden').forEach(function(n){
-    wireSchaden(n);
-    n.querySelectorAll('img.shot').forEach(function(img){ if(img.getAttribute('src')){ img.closest('.photo-drop').classList.add('has-img'); } });
-  }); renumberSchaeden(); }
-  document.getElementById('addSchaden').addEventListener('click', addSchaden);
 
   /* ---------- Feststoff: LAGA-Tabelle + Probenbezeichnungen ---------- */
   var feststoffBuilt=false;
@@ -1634,23 +1557,7 @@
     var blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
     trDownload(URL.createObjectURL(blob), trBasis()+'_Treppengelaender.json');
   }
-  function trExportFotos(){
-    trDatensatz();
-    var kacheln=[];
-    document.querySelectorAll('#form-treppe .fotokachel[data-dateiname]').forEach(function(k){
-      var img=k.querySelector('img.shot');
-      if(img && img.getAttribute('src')) kacheln.push(k);
-    });
-    if(!kacheln.length){ alert('Es sind noch keine Fotos vorhanden.'); return; }
-    if(!confirm(kacheln.length+' Foto(s) werden einzeln gespeichert. Fortfahren?')) return;
-    kacheln.forEach(function(k,i){
-      setTimeout(function(){
-        trDownload(k.querySelector('img.shot').getAttribute('src'), k.getAttribute('data-dateiname'));
-      }, i*400);
-    });
-  }
   document.getElementById('jsonBtn').addEventListener('click', trExportJson);
-  document.getElementById('fotoBtn').addEventListener('click', trExportFotos);
 
   /* ---------- Navigation ---------- */
   function showForm(proto){
@@ -1658,75 +1565,172 @@
     Object.keys(forms).forEach(function(k){ forms[k].style.display='none'; });
     forms[proto].style.display='block';
     backBtn.style.display='inline-block'; printBtn.style.display='inline-block'; saveBtn.style.display='inline-block';
+    var nb=document.getElementById('newBtn'); if(nb) nb.style.display='inline-block';
     if(proto==='raumluft' && secRaumluft.count()===0){ secRaumluft.add(); }
     if(proto==='pak' && secPak.count()===0){ secPak.add(); }
     if(proto==='pcb' && secPcb.count()===0){ secPcb.add(); }
     if(proto==='schimmel'){ if(secSchimmel.count()===0 && !secSchimmel.hasReferenz()){ secSchimmel.add(); } }
     if(proto==='feststoff'){ buildFeststoff(); }
-    if(proto==='beweis' && schaedenEl.children.length===0){ addSchaden(); }
     if(proto==='treppe'){ buildGwTable(); if(traeumeEl.children.length===0){ addTraum(); } }
     var istTreppe=(proto==='treppe');
     document.getElementById('jsonBtn').style.display=istTreppe?'inline-block':'none';
-    document.getElementById('fotoBtn').style.display=istTreppe?'inline-block':'none';
     window.scrollTo(0,0);
+    autoGrowSoon();
   }
   document.querySelectorAll('.card[data-proto]').forEach(function(card){
-    card.addEventListener('click', function(){ showForm(card.getAttribute('data-proto')); });
+    card.addEventListener('click', function(){
+      suppressAutosave=true;           // Auswahl frisch: erst nach echtem Öffnen scharf schalten
+      showForm(card.getAttribute('data-proto'));
+      dirty=false;
+      setTimeout(function(){ suppressAutosave=false; }, 300);
+    });
   });
-  backBtn.addEventListener('click', function(){
+
+  function gotoStart(){
     Object.keys(forms).forEach(function(k){ forms[k].style.display='none'; });
     startEl.style.display='block'; backBtn.style.display='none'; printBtn.style.display='none'; saveBtn.style.display='none';
-    document.getElementById('jsonBtn').style.display='none'; document.getElementById('fotoBtn').style.display='none'; window.scrollTo(0,0);
-  });
-  /* ---------- Print-Spiegelung: einzeilige Textfelder brechen im Druck um ---------- */
-  function printEchoSelector(el){
-    // nur Text-Eingaben, keine Datumsfelder/Zahlen/Selects/Checkboxen
-    if(el.tagName!=='INPUT') return false;
-    var t=(el.getAttribute('type')||'text').toLowerCase();
-    return (t==='text' || t===''); 
+    var nb=document.getElementById('newBtn'); if(nb) nb.style.display='none';
+    document.getElementById('jsonBtn').style.display='none'; window.scrollTo(0,0);
   }
-  function buildPrintEchos(){
-    document.querySelectorAll('.print-echo').forEach(function(s){ s.remove(); });
-    document.querySelectorAll('input.print-mirror-hidden').forEach(function(i){ i.classList.remove('print-mirror-hidden'); });
-    document.querySelectorAll('input').forEach(function(el){
-      if(!printEchoSelector(el)) return;
-      var val=el.value||'';
-      var span=document.createElement('span');
-      span.className='print-echo';
-      span.textContent=val;
-      el.insertAdjacentElement('afterend', span);
-      el.classList.add('print-mirror-hidden');
+  /* Aktuelles Formular wirklich leeren (auf Grundzustand zuruecksetzen) */
+  function resetCurrentForm(){
+    var proto=currentProto(); if(!proto) return;
+    var form=forms[proto];
+    // dynamische Bloecke entfernen
+    form.querySelectorAll('.probe,.messgruppe,.traum').forEach(function(n){ n.remove(); });
+    // alle Felder leeren
+    form.querySelectorAll('input,textarea,select').forEach(function(el){
+      if(el.type==='checkbox'||el.type==='radio'){ el.checked=el.defaultChecked; el.removeAttribute('checked'); }
+      else if(el.tagName==='SELECT'){ el.selectedIndex=0; }
+      else if(!el.readOnly){ el.value=''; el.removeAttribute('value'); }
+    });
+    // Echos neben den Feldern entfernen
+    form.querySelectorAll('.print-echo').forEach(function(e){ e.remove(); });
+    form.querySelectorAll('.print-mirror-hidden').forEach(function(e){ e.classList.remove('print-mirror-hidden'); });
+    // Treppen: Pruef-ID neu
+    var pid=document.getElementById('trPruefungId'); if(pid){ pid.value=''; pid.removeAttribute('value'); }
+    // Grundgeruest je Typ neu aufbauen
+    suppressAutosave=true;
+    if(proto==='raumluft'){ secRaumluft.add(); }
+    if(proto==='pak'){ secPak.add(); }
+    if(proto==='pcb'){ secPcb.add(); }
+    if(proto==='schimmel'){ secSchimmel.add(); }
+    if(proto==='treppe'){ if(traeumeEl.children.length===0){ addTraum(); } }
+    setTimeout(function(){ suppressAutosave=false; }, 300);
+    dirty=false;
+    autoGrowSoon();
+    window.scrollTo(0,0);
+  }
+  /* Sicherheitsabfrage vor Verlassen/Leeren; action() wird bei Weitermachen ausgefuehrt */
+  function guardedLeave(action){
+    if(!dirty){ action(); return; }
+    var ans=window.confirm('Es gibt ungespeicherte Änderungen.\n\nOK = jetzt speichern, danach fortfahren.\nAbbrechen = zurück zum Formular.');
+    if(ans){
+      // Speichern; nur bei erfolgreichem Speichern fortfahren
+      if(savePrefilled()){ clearDraft(); action(); }
+      // bei Abbruch im Datei-Dialog: nichts tun
+    } else {
+      // Zweite Stufe: bewusst verwerfen?
+      var verwerfen=window.confirm('Möchtest du die Änderungen VERWERFEN und ohne Speichern fortfahren?\n\nOK = verwerfen und fortfahren.\nAbbrechen = zurück zum Formular (nichts passiert).');
+      if(verwerfen){ clearDraft(); action(); }
+      // sonst: zurueck ins Formular, nichts passiert
+    }
+  }
+  backBtn.addEventListener('click', function(){
+    guardedLeave(function(){ clearDraft(); gotoStart(); });
+  });
+  /* ---------- Print-Spiegelung: dauerhafte Echos (iOS-sicher, ohne beforeprint) ---------- */
+  function isEchoInput(el){
+    if(el.tagName!=='INPUT') return false;
+    if(el.classList.contains('no-print')) return false;
+    var t=(el.getAttribute('type')||'text').toLowerCase();
+    return (t==='text' || t==='');
+  }
+  function isEchoTextarea(el){
+    return el.tagName==='TEXTAREA' && !el.classList.contains('no-print');
+  }
+  function printEchoSelector(el){ return isEchoInput(el) || isEchoTextarea(el); }
+  // Echo neben dem Feld anlegen/aktualisieren. Verstecken des Originals passiert NICHT hier,
+  // sondern erst unmittelbar vor dem Druck (prepareEchosForPrint) und nur bei befuelltem Echo.
+  function ensureEcho(el){
+    if(!printEchoSelector(el)) return null;
+    var e=el.nextElementSibling;
+    var isTa=isEchoTextarea(el);
+    var cls=isTa?'print-echo print-echo-ta':'print-echo';
+    if(!e || !e.classList || !e.classList.contains('print-echo')){
+      e=document.createElement(isTa?'div':'span');
+      e.className=cls;
+      el.insertAdjacentElement('afterend', e);
+    } else {
+      e.className=cls;
+    }
+    e.textContent=el.value||'';
+    return e;
+  }
+  function refreshAllEchos(){
+    document.querySelectorAll('input,textarea').forEach(ensureEcho);
+  }
+  // Direkt vor dem Druck: jedes Echo frisch aus dem echten Feld lesen und das Original
+  // NUR dann verstecken, wenn sein Echo tatsaechlich Text hat. So kann ein leeres Echo
+  // niemals ein ausgefuelltes Feld ueberdecken - egal welcher Browser, egal ob nachtraeglich getippt.
+  function prepareEchosForPrint(){
+    document.querySelectorAll('input,textarea').forEach(function(el){
+      if(!printEchoSelector(el)){ el.classList.remove('print-mirror-hidden'); return; }
+      var e=ensureEcho(el);
+      if(e && (el.value||'').length>0){ el.classList.add('print-mirror-hidden'); }
+      else { el.classList.remove('print-mirror-hidden'); }
     });
   }
-  function clearPrintEchos(){
-    document.querySelectorAll('.print-echo').forEach(function(s){ s.remove(); });
-    document.querySelectorAll('input.print-mirror-hidden').forEach(function(i){ i.classList.remove('print-mirror-hidden'); });
+  // Nach dem Druck: Verstecken wieder aufheben, damit am Bildschirm alle Felder normal sichtbar sind.
+  function unhideAfterPrint(){
+    document.querySelectorAll('.print-mirror-hidden').forEach(function(el){
+      el.classList.remove('print-mirror-hidden');
+    });
+  }
+  // live aktualisieren bei jeder Eingabe/Änderung
+  document.addEventListener('input', function(e){
+    if(e.target && printEchoSelector(e.target)) ensureEcho(e.target);
+  });
+  document.addEventListener('change', function(e){
+    if(e.target && printEchoSelector(e.target)) ensureEcho(e.target);
+  });
+  function echosSoon(){
+    refreshAllEchos();
+    [60,200,500,1000].forEach(function(ms){ setTimeout(refreshAllEchos, ms); });
   }
 
   /* ---------- Auto-Grow für mehrzeilige Felder ---------- */
   function autoGrow(el){
     if(!el || el.tagName!=='TEXTAREA') return;
+    if(el.offsetParent===null && el.getClientRects().length===0) return;
     el.style.height='auto';
-    el.style.height=(el.scrollHeight)+'px';
+    var h=el.scrollHeight;
+    if(h>0) el.style.height=h+'px';
   }
   function autoGrowAll(){
     document.querySelectorAll('textarea').forEach(autoGrow);
   }
+  function autoGrowSoon(){
+    autoGrowAll(); refreshAllEchos();
+    [60,200,500,1000].forEach(function(ms){ setTimeout(function(){ autoGrowAll(); refreshAllEchos(); }, ms); });
+  }
   document.addEventListener('input', function(e){
     if(e.target && e.target.tagName==='TEXTAREA') autoGrow(e.target);
   });
-  // vor jedem Druck/Export alle Felder auf vollen Inhalt bringen
+  document.addEventListener('focusin', function(e){
+    if(e.target && e.target.tagName==='TEXTAREA') autoGrow(e.target);
+  });
+  // vor jedem Druck alle Felder aktualisieren und Originale nur bei befuelltem Echo verstecken
   window.addEventListener('beforeprint', function(){
-    autoGrowAll();
-    buildPrintEchos();
+    autoGrowAll(); prepareEchosForPrint();
     document.body.classList.add('printing');
   });
   window.addEventListener('afterprint', function(){
     document.body.classList.remove('printing');
-    clearPrintEchos();
+    unhideAfterPrint();
   });
 
-  printBtn.addEventListener('click', function(){ autoGrowAll(); window.print(); });
+  printBtn.addEventListener('click', function(){ autoGrowAll(); prepareEchosForPrint(); setTimeout(function(){ window.print(); }, 40); });
 
   /* ---------- Vorbefuellte Datei speichern ---------- */
   var saveBtn=document.getElementById('saveBtn');
@@ -1738,34 +1742,129 @@
       else { el.setAttribute('value', el.value); }
     });
   }
-  function savePrefilled(){
-    var proto='raumluft';
+  /* Aktuell sichtbares Protokoll ermitteln */
+  function currentProto(){
+    var proto=null;
     Object.keys(forms).forEach(function(k){ if(forms[k].style.display!=='none') proto=k; });
+    return proto;
+  }
+  /* Anzeigename der Protokollart (fuer Dateinamen-Vorschlag) */
+  var PROTO_ART={ raumluft:'VDI 3492', pak:'PAK', pcb:'PCB', schimmel:'Schimmelpilz',
+                  feststoff:'Feststoff', treppe:'Treppengeländer' };
+  /* Kopf-Feld fuer den Namensvorschlag je Typ (Objekt bevorzugt) */
+  function kopfFeldFuerName(proto){
+    var form=forms[proto]; if(!form) return '';
+    if(proto==='treppe'){ var o=document.getElementById('trObjekt'); return o?o.value:''; }
+    if(proto==='feststoff'){
+      // "Objekt / Lage / Betreiber" ist das 6. fill im linken Kopfblock
+      var lbls=form.querySelectorAll('.frow label.lbl-w');
+      for(var i=0;i<lbls.length;i++){ if(/Objekt/.test(lbls[i].textContent)){ var inp=lbls[i].parentNode.querySelector('input'); if(inp) return inp.value; } }
+      return '';
+    }
+    // Luft-Typen: neues Messobjekt-Feld
+    var obj=form.querySelector('.hk-obj-name');
+    return obj?obj.value:'';
+  }
+  function cleanName(s){
+    return String(s||'').replace(/[\/\\:*?"<>|]+/g,'-')
+      .replace(/[^A-Za-z0-9ÄÖÜäöüß ._-]/g,'')
+      .replace(/\s+/g,'_').replace(/_+/g,'_').replace(/^[_-]+|[_-]+$/g,'').trim();
+  }
+  function suggestName(proto){
+    var art=PROTO_ART[proto]||'Protokoll';
+    var kopf=cleanName(kopfFeldFuerName(proto));
+    var base=cleanName(art)+(kopf?('_'+kopf):'');
+    return base||'Protokoll';
+  }
+
+  function buildPrefilledHtml(proto){
+    autoGrowAll(); refreshAllEchos();
     snapshotAttributes();
     document.body.setAttribute('data-autoopen', proto);
     var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
     document.body.removeAttribute('data-autoopen');
-    var name=prompt('Dateiname für die vorbefüllte Datei:', 'Protokoll_vorbefuellt');
-    if(name===null) return;
+    return html;
+  }
+  function savePrefilled(){
+    var proto=currentProto()||'raumluft';
+    var html=buildPrefilledHtml(proto);
+    var name=prompt('Dateiname für die vorbefüllte Datei:', suggestName(proto));
+    if(name===null) return false;
     if(!/\.html?$/i.test(name)) name+='.html';
     var a=document.createElement('a');
     a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
     a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    markSaved();
+    return true;
   }
   saveBtn.addEventListener('click', savePrefilled);
+
+  /* ---------- Autosave (Absturzschutz, localStorage) ---------- */
+  var AUTOSAVE_KEY='grieseler_protokoll_autosave_v1';
+  var dirty=false, autosaveTimer=null, restoring=false, suppressAutosave=true;
+  function markDirty(){
+    if(restoring||suppressAutosave) return;
+    dirty=true;
+    if(autosaveTimer) clearTimeout(autosaveTimer);
+    autosaveTimer=setTimeout(saveDraft, 800);
+  }
+  function markSaved(){ dirty=false; }
+  function saveDraft(){
+    try{
+      var proto=currentProto(); if(!proto) return;
+      var html=buildPrefilledHtml(proto);
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({ t:Date.now(), proto:proto, html:html }));
+    }catch(e){ /* Speicher voll / privat: still ignorieren */ }
+  }
+  function clearDraft(){ try{ localStorage.removeItem(AUTOSAVE_KEY); }catch(e){} dirty=false; }
+  function readDraft(){
+    try{ var raw=localStorage.getItem(AUTOSAVE_KEY); return raw?JSON.parse(raw):null; }catch(e){ return null; }
+  }
+  // jede Eingabe markiert Aenderung
+  document.addEventListener('input',  markDirty);
+  document.addEventListener('change', markDirty);
+
+  /* Zwischenstand beim Öffnen anbieten (nur in der leeren App, nicht in vorbefüllten Dateien) */
+  function offerRestore(){
+    if(document.body.getAttribute('data-autoopen')) return; // vorbefüllte Datei: kein Draft-Angebot
+    var d=readDraft(); if(!d||!d.html) return;
+    var when=''; try{ when=new Date(d.t).toLocaleString('de-DE'); }catch(e){}
+    var art=PROTO_ART[d.proto]||'Protokoll';
+    if(confirm('Es gibt einen automatisch gesicherten Zwischenstand ('+art+(when?(', '+when):'')+').\n\nLetzten Stand wiederherstellen?')){
+      restoring=true;
+      document.open(); document.write(d.html); document.close();
+    } else {
+      clearDraft();
+    }
+  }
+
+  /* Neues Protokoll: aktuelles Formular leeren (mit Sicherheitsabfrage) */
+  (function(){
+    var nb=document.getElementById('newBtn');
+    if(nb) nb.addEventListener('click', function(){ guardedLeave(resetCurrentForm); });
+  })();
 
   /* ---------- Init (auch fuer vorbefuellte Dateien) ---------- */
   secRaumluft.wireExisting();
   secPak.wireExisting();
   secPcb.wireExisting();
   secSchimmel.wireExisting();
-  wireExistingSchaeden();
   buildGwTable();
   wireExistingTraeume();
-  autoGrowAll();
+  unhideAfterPrint();   // evtl. aus alter Version fest gespeichertes Verstecken aufheben
+  autoGrowSoon();
   (function(){
     var ao=document.body.getAttribute('data-autoopen');
-    if(ao){ showForm(ao); }
+    if(ao){
+      // vorbefüllte Datei: direkt öffnen, Bearbeiten soll autosaven
+      showForm(ao);
+      dirty=false;
+      setTimeout(function(){ suppressAutosave=false; }, 400);
+    } else {
+      // leere App: Zwischenstand anbieten, dann Autosave scharf schalten
+      offerRestore();
+      setTimeout(function(){ suppressAutosave=false; }, 400);
+    }
   })();
 </script>
 <script>
