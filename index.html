@@ -225,11 +225,11 @@
 
 <div class="toolbar no-print">
   <button id="backBtn" class="ghost" style="display:none">&larr; Auswahl</button>
-  <span class="tb-title">Grieseler · Protokoll-Generator <span class="appver">v5 · 2026-09-28</span></span>
+  <span class="tb-title">Grieseler · Protokoll-Generator <span class="appver">v6 · 2026-09-28</span></span>
   <button id="newBtn" class="ghost" style="display:none">Neues Protokoll</button>
   <button id="saveBtn" style="display:none">Vorbefüllte Datei speichern</button>
   <button id="jsonBtn" class="ghost" style="display:none">Daten (JSON)</button>
-  <button id="printBtn" style="display:none">Als PDF drucken / speichern</button>
+  <button id="printBtn" style="display:none">PDF speichern</button>
 </div>
 
 <!-- ===================== STARTAUSWAHL ===================== -->
@@ -266,7 +266,7 @@
     </button>
   </div>
   <p class="hint">Weitere Protokolltypen können hier später ergänzt werden.</p>
-  <p class="hint">App-Version v5 · 2026-09-28</p>
+  <p class="hint">App-Version v6 · 2026-09-28</p>
 </div>
 
 <!-- ===================== RAUMLUFT VDI 3492 ===================== -->
@@ -1730,7 +1730,26 @@
     unhideAfterPrint();
   });
 
-  printBtn.addEventListener('click', function(){ autoGrowAll(); prepareEchosForPrint(); setTimeout(function(){ window.print(); }, 40); });
+  // PDF speichern: Dateiname vorschlagen (Safari/iOS nimmt document.title als PDF-Namen),
+  // Felder einfrieren (Echos), drucken, danach Titel zurücksetzen.
+  var ORIG_TITLE=document.title;
+  function pdfSpeichern(){
+    // einmaliger Hinweis auf den iOS-Sichern-Schritt
+    try{
+      if(!localStorage.getItem('grieseler_pdf_hint_v1')){
+        localStorage.setItem('grieseler_pdf_hint_v1','1');
+        alert('PDF speichern:\nGleich öffnet sich die Vorschau. Auf dem iPhone/iPad dort auf „Teilen“ bzw. „Sichern“ tippen und „In Dateien sichern“ wählen. Der Dateiname ist bereits vorgeschlagen.');
+      }
+    }catch(e){}
+    autoGrowAll(); prepareEchosForPrint();
+    var proto=currentProto();
+    if(proto){ try{ document.title=suggestName(proto); }catch(e){} }
+    setTimeout(function(){
+      window.print();
+      setTimeout(function(){ document.title=ORIG_TITLE; }, 800);
+    }, 60);
+  }
+  printBtn.addEventListener('click', pdfSpeichern);
 
   /* ---------- Vorbefuellte Datei speichern ---------- */
   var saveBtn=document.getElementById('saveBtn');
