@@ -189,6 +189,43 @@
   table.gw input{ width:66px; text-align:center; font:inherit; font-size:12px; padding:4px; border:1px solid #c9ced6; border-radius:4px; background:#fff; }
   table.gw input:focus{ outline:none; border-color:var(--accent); }
   .modalfoot{ padding:10px 16px; border-top:1px solid #dde1e7; font-size:11.5px; color:var(--muted); background:#fafbfc; }
+  .toolbar .tb-short{ display:none; }
+  .openbar{ text-align:center; margin:-6px 0 16px; }
+  .openbar button{ font-size:14px; font-weight:bold; padding:9px 16px; border:1.5px solid var(--accent); background:#fff; color:var(--accent); border-radius:8px; cursor:pointer; }
+  /* ===== Mobile Bildschirmansicht (nur Screen, betrifft NICHT das A4-PDF) ===== */
+  @media screen and (max-width:640px){
+    /* Toolbar nur knopfhoch, kein Umbruch -> horizontal scrollbar */
+    .toolbar{ gap:6px; padding:5px 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; white-space:nowrap; }
+    .toolbar button{ font-size:13px; padding:6px 9px; flex:none; white-space:nowrap; }
+    .toolbar .tb-title{ flex:1 0 auto; }
+    .toolbar .tb-long{ display:none; }
+    .toolbar .tb-short{ display:inline; }
+    .toolbar .appver{ display:none; }
+    /* volle Breite, schmale Raender */
+    .screen{ margin:8px auto; max-width:none; }
+    .sheet{ padding:12px 12px; box-shadow:none; }
+    .brief{ flex-wrap:wrap; gap:2px 10px; }
+    /* alles einspaltig */
+    .grid2{ grid-template-columns:1fr; gap:0; }
+    .cols,.sign,.messgruppe .klima,.messfussnote,.schaden .sbody{ flex-direction:column; gap:0; }
+    .lagawrap{ flex-direction:column; gap:12px; overflow-x:auto; }
+    .pbez{ width:auto; }
+    /* Zeilen umbrechen: Beschriftung oben, Feld darunter */
+    .frow{ flex-wrap:wrap; align-items:center; }
+    .frow > label.lbl-w, .headsub .lbl-w, .probe .lbl-w, .messgruppe .lbl-w, .traum .lbl-w, .tmangel .lbl-w{ min-width:0; flex:0 0 100%; }
+    .frow input.fill, .frow textarea.fill{ max-width:none !important; flex:1 1 140px; }
+    .mess > label.mlab{ min-width:0; flex:0 0 100%; }
+    .subprobe{ flex-wrap:wrap; }
+    .subprobe .koerpernr{ flex:1 1 120px; width:auto; }
+    .photo-drop{ width:100%; }
+    .fotokachel{ width:calc(50% - 6px); }
+    .fotokachel .photo-drop{ width:100%; }
+    .card{ width:100%; }
+    /* Eingabefelder mind. 16px -> iOS zoomt beim Antippen nicht hinein */
+    input.fill, textarea.fill, select.fill,
+    .probe .pname, .messgruppe .mname, .traum .tname, .mess input.wert, .mess input.longfield,
+    .subprobe .koerpernr, .bu, table.gw input, .moduszeile select{ font-size:16px; }
+  }
   @media print{
     @page{ size:A4; margin:11mm; }
     html,body{ background:#fff; }
@@ -225,7 +262,7 @@
 
 <div class="toolbar no-print">
   <button id="backBtn" class="ghost" style="display:none">&larr; Auswahl</button>
-  <span class="tb-title">Grieseler · Protokoll-Generator <span class="appver">v8 · 2026-11-13</span></span>
+  <span class="tb-title"><span class="tb-long">Grieseler · Protokoll-Generator</span><span class="tb-short">Protokoll</span> <span class="appver">v9 · 2026-11-13</span></span>
   <button id="newBtn" class="ghost" style="display:none">Neues Protokoll</button>
   <button id="saveBtn" style="display:none">Vorbefüllte Datei speichern</button>
   <button id="jsonBtn" class="ghost" style="display:none">Daten (JSON)</button>
@@ -239,6 +276,10 @@
     <span>Tel. 0231 - 99 20 78 0</span><span>info@grieseler-gmbh.de</span>
   </div>
   <h2>Welches Protokoll möchten Sie erstellen?</h2>
+  <div class="openbar no-print">
+    <button id="openBtn" type="button">Gespeichertes Protokoll öffnen …</button>
+    <input id="openFile" type="file" accept=".html,.htm,text/html" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+  </div>
   <div class="cards">
     <button class="card" data-proto="raumluft">
       <h3>Raumluftmessung VDI 3492</h3>
@@ -254,11 +295,11 @@
     </button>
     <button class="card" data-proto="voc">
       <h3>Raumluftmessung VOC</h3>
-      <p>Flüchtige organische Verbindungen (VOC) in der Innenraumluft. Doppel-Tenax an Holbach BiVOC2V2, 0,15 SL/min · 20 min = 3 SL je Röhrchen. Mit + Button.</p>
+      <p>Flüchtige organische Verbindungen (VOC) in der Innenraumluft. Doppel-Tenax an BiVOC2V2, 0,15 SL/min · 20 min = 3 SL je Röhrchen. Mit + Button.</p>
     </button>
     <button class="card" data-proto="formaldehyd">
       <h3>Raumluftmessung Formaldehyd</h3>
-      <p>Formaldehyd in der Innenraumluft. DNPH-Kartusche an Holbach BiVOC2V2, 1 SL/min · 30 min = 30 SL. Mit + Button.</p>
+      <p>Formaldehyd in der Innenraumluft. DNPH-Kartusche an BiVOC2V2, 1 SL/min · 30 min = 30 SL. Mit + Button.</p>
     </button>
     <button class="card" data-proto="schimmel">
       <h3>Raumluftmessung Schimmelpilz</h3>
@@ -274,7 +315,7 @@
     </button>
   </div>
   <p class="hint">Weitere Protokolltypen können hier später ergänzt werden.</p>
-  <p class="hint">App-Version v8 · 2026-11-13</p>
+  <p class="hint">App-Version v9 · 2026-11-13</p>
 </div>
 
 <!-- ===================== RAUMLUFT VDI 3492 ===================== -->
@@ -368,8 +409,6 @@
   <div class="headsub">
     <div class="cap">Probenahme / Geräte</div>
     <div class="grid2">
-      <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" placeholder="Typ"></div>
-      <div class="frow"><label class="lbl-w">Pumpen-Nr.:</label><input class="fill"></div>
       <div class="frow"><label class="lbl-w">Sorbensröhrchen:</label><input class="fill" value="ORBO 43"></div>
       <div class="frow"><label class="lbl-w">Fluss kalibriert:</label><input class="fill" placeholder="l/min, geprüft am …"></div>
     </div>
@@ -426,8 +465,6 @@
     </div>
     <div class="frow"><label class="lbl-w">Vorgabe:</label><span class="pcb-vorgabe" style="font-size:12px">3 l/min · 8 h = 1,44 m³</span></div>
     <div class="grid2">
-      <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" placeholder="Typ"></div>
-      <div class="frow"><label class="lbl-w">Pumpen-Nr.:</label><input class="fill"></div>
       <div class="frow"><label class="lbl-w">Sorbensröhrchen:</label><input class="fill" value="Florisil"></div>
       <div class="frow"><label class="lbl-w">Fluss kalibriert:</label><input class="fill" placeholder="l/min, geprüft am …"></div>
     </div>
@@ -479,8 +516,6 @@
   <div class="headsub">
     <div class="cap">Probenahme / Geräte</div>
     <div class="grid2">
-      <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="Holbach BiVOC2V2"></div>
-      <div class="frow"><label class="lbl-w">Pumpen-Nr.:</label><input class="fill"></div>
       <div class="frow"><label class="lbl-w">Sammelmedium:</label><input class="fill" value="Tenax (Doppel-Tenax)"></div>
       <div class="frow"><label class="lbl-w">Fluss kalibriert:</label><input class="fill" placeholder="SL/min, geprüft am …"></div>
     </div>
@@ -532,8 +567,6 @@
   <div class="headsub">
     <div class="cap">Probenahme / Geräte</div>
     <div class="grid2">
-      <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="Holbach BiVOC2V2"></div>
-      <div class="frow"><label class="lbl-w">Pumpen-Nr.:</label><input class="fill"></div>
       <div class="frow"><label class="lbl-w">Sammelmedium:</label><input class="fill" value="DNPH-Kartusche"></div>
       <div class="frow"><label class="lbl-w">Fluss kalibriert:</label><input class="fill" placeholder="SL/min, geprüft am …"></div>
     </div>
@@ -1051,7 +1084,7 @@
       <button type="button" class="rm no-print">Entfernen</button>
     </div>
     <div class="frow"><label class="lbl-w">Entnahmeort / Etage / Bereich:</label><input class="fill"></div>
-    <div class="frow"><label class="lbl-w">Gerätetyp:</label><input class="fill" value="BPP 4-8 LA">
+    <div class="frow"><label class="lbl-w">Gerätetyp:</label><input class="fill" value="BPP 4-8">
       <label>Geräte-Nr.:</label><input class="fill" style="max-width:150px"></div>
     <div class="frow"><label class="lbl-w">Meßkopfnummer:</label><input class="fill" value="E "></div>
     <div class="frow"><label class="lbl-w">Volumenstrom:</label><input class="fill vstrom" value="8 l/min" style="max-width:120px">
@@ -1068,7 +1101,7 @@
       <button type="button" class="rm no-print">Entfernen</button>
     </div>
     <div class="frow"><label class="lbl-w">Entnahmeort / Etage / Bereich:</label><input class="fill"></div>
-    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill">
+    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="BPP 4-8">
       <label>Pumpen-Nr.:</label><input class="fill" style="max-width:150px"></div>
     <div class="frow"><label class="lbl-w">Sorbensröhrchen:</label><input class="fill" value="ORBO 43"></div>
     <div class="frow"><label class="lbl-w">Volumenstrom:</label><input class="fill vstrom" value="2 l/min" style="max-width:120px">
@@ -1085,7 +1118,7 @@
       <button type="button" class="rm no-print">Entfernen</button>
     </div>
     <div class="frow"><label class="lbl-w">Entnahmeort / Etage / Bereich:</label><input class="fill"></div>
-    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="Holbach BiVOC2V2">
+    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="BiVOC2V2">
       <label>Pumpen-Nr.:</label><input class="fill" style="max-width:150px"></div>
     <div class="frow"><label class="lbl-w">Sammelmedium:</label><input class="fill" value="Tenax"></div>
     <div class="frow"><label class="lbl-w">Röhrchen-Nr. Kanal 1:</label><input class="fill" style="max-width:150px">
@@ -1104,7 +1137,7 @@
       <button type="button" class="rm no-print">Entfernen</button>
     </div>
     <div class="frow"><label class="lbl-w">Entnahmeort / Etage / Bereich:</label><input class="fill"></div>
-    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="Holbach BiVOC2V2">
+    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="BiVOC2V2">
       <label>Pumpen-Nr.:</label><input class="fill" style="max-width:150px"></div>
     <div class="frow"><label class="lbl-w">Sammelmedium:</label><input class="fill" value="DNPH-Kartusche"></div>
     <div class="frow"><label class="lbl-w">Kartuschen-Nr.:</label><input class="fill" style="max-width:150px"></div>
@@ -1122,7 +1155,7 @@
       <button type="button" class="rm no-print">Entfernen</button>
     </div>
     <div class="frow"><label class="lbl-w">Entnahmeort / Etage / Bereich:</label><input class="fill"></div>
-    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill">
+    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="BPP 4-8">
       <label>Pumpen-Nr.:</label><input class="fill" style="max-width:150px"></div>
     <div class="frow"><label class="lbl-w">Sorbensröhrchen:</label><input class="fill" value="Florisil"></div>
     <div class="frow"><label class="lbl-w">Volumenstrom:</label><input class="fill vstrom" value="3 l/min" style="max-width:120px">
@@ -1813,7 +1846,7 @@
     var ans=window.confirm('Es gibt ungespeicherte Änderungen.\n\nOK = jetzt speichern, danach fortfahren.\nAbbrechen = zurück zum Formular.');
     if(ans){
       // Speichern; nur bei erfolgreichem Speichern fortfahren
-      if(savePrefilled()){ clearDraft(); action(); }
+      savePrefilled().then(function(ok){ if(ok){ clearDraft(); action(); } });
       // bei Abbruch im Datei-Dialog: nichts tun
     } else {
       // Zweite Stufe: bewusst verwerfen?
@@ -1990,17 +2023,40 @@
     document.body.removeAttribute('data-autoopen');
     return html;
   }
-  function savePrefilled(){
-    var proto=currentProto()||'raumluft';
-    var html=buildPrefilledHtml(proto);
-    var name=prompt('Dateiname für die vorbefüllte Datei:', suggestName(proto));
+  /* Touch-Geraet (iPhone/iPad): Datei ueber das Teilen-Menue weitergeben
+     ("In Dateien sichern", Mail-Anhang ...). Am PC: normaler Download mit Namensabfrage. */
+  function kannTeilen(file){
+    try{
+      var touch=window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+      return !!(touch && navigator.share && navigator.canShare && navigator.canShare({files:[file]}));
+    }catch(e){ return false; }
+  }
+  function dateiHerunterladen(html, vorschlag){
+    var name=prompt('Dateiname für die vorbefüllte Datei:', vorschlag);
     if(name===null) return false;
     if(!/\.html?$/i.test(name)) name+='.html';
     var a=document.createElement('a');
     a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
     a.download=name; document.body.appendChild(a); a.click(); a.remove();
-    markSaved();
     return true;
+  }
+  // liefert ein Promise<boolean>: true = gespeichert/weitergegeben
+  function savePrefilled(){
+    var proto=currentProto()||'raumluft';
+    var html=buildPrefilledHtml(proto);
+    var name=suggestName(proto)+'.html';
+    var file=null;
+    try{ file=new File([html], name, {type:'text/html'}); }catch(e){}
+    if(file && kannTeilen(file)){
+      return navigator.share({files:[file], title:name}).then(function(){
+        markSaved(); return true;
+      }, function(err){
+        if(err && err.name==='AbortError') return false;          // im Teilen-Menue abgebrochen
+        var ok=dateiHerunterladen(html, suggestName(proto)); if(ok) markSaved(); return ok;
+      });
+    }
+    var ok=dateiHerunterladen(html, suggestName(proto)); if(ok) markSaved();
+    return Promise.resolve(ok);
   }
   saveBtn.addEventListener('click', savePrefilled);
 
@@ -2047,6 +2103,55 @@
   (function(){
     var nb=document.getElementById('newBtn');
     if(nb) nb.addEventListener('click', function(){ guardedLeave(resetCurrentForm); });
+  })();
+
+  /* ---------- Gespeichertes Protokoll öffnen ----------
+     Nur das Formular aus der Datei wird übernommen; der App-Code bleibt die aktuelle Version. */
+  function protokollAusText(text){
+    var src=null, proto=null;
+    try{
+      var doc=new DOMParser().parseFromString(text,'text/html');
+      proto=doc.body && doc.body.getAttribute('data-autoopen');
+      if(proto && forms[proto]) src=doc.getElementById('form-'+proto);
+    }catch(e){}
+    if(!src){ alert('Diese Datei ist kein gespeichertes Protokoll aus dem Protokoll-Generator.'); return false; }
+    var base=new DOMParser().parseFromString('<!DOCTYPE html>\n'+document.documentElement.outerHTML,'text/html');
+    base.getElementById('form-'+proto).innerHTML=src.innerHTML;
+    base.body.setAttribute('data-autoopen', proto);
+    var html='<!DOCTYPE html>\n'+base.documentElement.outerHTML;
+    restoring=true;
+    document.open(); document.write(html); document.close();
+    return true;
+  }
+  (function(){
+    var ob=document.getElementById('openBtn'), of=document.getElementById('openFile');
+    if(!ob||!of) return;
+    ob.addEventListener('click', function(){ of.value=''; of.click(); });
+    of.addEventListener('change', function(){
+      var f=of.files && of.files[0]; if(!f) return;
+      var r=new FileReader();
+      r.onload=function(){ guardedLeave(function(){ clearDraft(); protokollAusText(String(r.result||'')); }); };
+      r.onerror=function(){ alert('Datei konnte nicht gelesen werden.'); };
+      r.readAsText(f,'utf-8');
+    });
+  })();
+
+  /* ---------- Mobil: aktives Feld sichtbar halten, sichtbare Hoehe ---------- */
+  (function(){
+    var vv=window.visualViewport;
+    function setVvh(){ var h=vv?vv.height:window.innerHeight; document.documentElement.style.setProperty('--vvh', h+'px'); }
+    setVvh();
+    if(vv){ vv.addEventListener('resize', setVvh); vv.addEventListener('scroll', setVvh); }
+    else window.addEventListener('resize', setVvh);
+    var isTouch=('ontouchstart' in window) || (navigator.maxTouchPoints>0);
+    if(!isTouch) return;
+    document.addEventListener('focusin', function(e){
+      var t=e.target; if(!t || !/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+      if(t.type==='checkbox'||t.type==='radio'||t.type==='file') return;
+      [250,600].forEach(function(ms){ setTimeout(function(){
+        if(document.activeElement===t && t.scrollIntoView){ try{ t.scrollIntoView({block:'center', behavior:'smooth'}); }catch(_){ t.scrollIntoView(); } }
+      }, ms); });
+    });
   })();
 
   /* ---------- Init (auch fuer vorbefuellte Dateien) ---------- */
