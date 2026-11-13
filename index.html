@@ -225,7 +225,7 @@
 
 <div class="toolbar no-print">
   <button id="backBtn" class="ghost" style="display:none">&larr; Auswahl</button>
-  <span class="tb-title">Grieseler · Protokoll-Generator <span class="appver">v6 · 2026-09-28</span></span>
+  <span class="tb-title">Grieseler · Protokoll-Generator <span class="appver">v8 · 2026-11-13</span></span>
   <button id="newBtn" class="ghost" style="display:none">Neues Protokoll</button>
   <button id="saveBtn" style="display:none">Vorbefüllte Datei speichern</button>
   <button id="jsonBtn" class="ghost" style="display:none">Daten (JSON)</button>
@@ -250,7 +250,15 @@
     </button>
     <button class="card" data-proto="pcb">
       <h3>Raumluftmessung PCB</h3>
-      <p>Polychlorierte Biphenyle (PCB) in der Innenraumluft. Florisilröhrchen, 3 l/min · 8 h = 1,44 m³. Mit + Button.</p>
+      <p>Polychlorierte Biphenyle (PCB) in der Innenraumluft. Florisilröhrchen. Langzeit 3 l/min · 8 h = 1,44 m³ oder Kurzzeit 4 l/min · 50 min = 200 l. Mit + Button.</p>
+    </button>
+    <button class="card" data-proto="voc">
+      <h3>Raumluftmessung VOC</h3>
+      <p>Flüchtige organische Verbindungen (VOC) in der Innenraumluft. Doppel-Tenax an Holbach BiVOC2V2, 0,15 SL/min · 20 min = 3 SL je Röhrchen. Mit + Button.</p>
+    </button>
+    <button class="card" data-proto="formaldehyd">
+      <h3>Raumluftmessung Formaldehyd</h3>
+      <p>Formaldehyd in der Innenraumluft. DNPH-Kartusche an Holbach BiVOC2V2, 1 SL/min · 30 min = 30 SL. Mit + Button.</p>
     </button>
     <button class="card" data-proto="schimmel">
       <h3>Raumluftmessung Schimmelpilz</h3>
@@ -266,7 +274,7 @@
     </button>
   </div>
   <p class="hint">Weitere Protokolltypen können hier später ergänzt werden.</p>
-  <p class="hint">App-Version v6 · 2026-09-28</p>
+  <p class="hint">App-Version v8 · 2026-11-13</p>
 </div>
 
 <!-- ===================== RAUMLUFT VDI 3492 ===================== -->
@@ -412,6 +420,11 @@
   </div>
   <div class="headsub">
     <div class="cap">Probenahme / Geräte</div>
+    <div class="frow pcb-messart"><label class="lbl-w">Messart:</label>
+      <label class="cb"><input type="radio" name="pcb-messart" class="r-pcbart" value="lang" checked> Langzeitmessung</label>
+      <label class="cb" style="margin-left:14px"><input type="radio" name="pcb-messart" class="r-pcbart" value="kurz"> Kurzzeitmessung</label>
+    </div>
+    <div class="frow"><label class="lbl-w">Vorgabe:</label><span class="pcb-vorgabe" style="font-size:12px">3 l/min · 8 h = 1,44 m³</span></div>
     <div class="grid2">
       <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" placeholder="Typ"></div>
       <div class="frow"><label class="lbl-w">Pumpen-Nr.:</label><input class="fill"></div>
@@ -422,7 +435,113 @@
   <div id="proben-pcb"></div>
   <div class="addbar no-print">
     <button id="addProbePcb" type="button">+ Probe hinzufügen</button>
-    <div class="hint">Vorgabe: Florisil, 3 l/min über 8 h = 1,44 m³. „+" zählt die Nummer aus dem letzten Namen hoch.</div>
+    <div class="hint">Messart oben wählen – setzt Volumenstrom und Dauer aller Proben (danach frei änderbar). „+" zählt die Nummer aus dem letzten Namen hoch.</div>
+  </div>
+  <div class="sign">
+    <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
+    <div class="frow"><label class="lbl-w">Unterschrift:</label><input class="fill"></div>
+  </div>
+</div>
+
+<!-- ===================== RAUMLUFT VOC ===================== -->
+<div id="form-voc" class="screen sheet form" style="display:none">
+  <div class="brief">
+    <span class="firma">Grieseler GmbH</span><span>Mengeder Schulstr. 4, 44359 Dortmund</span>
+    <span>Tel. 0231 - 99 20 78 0</span><span>info@grieseler-gmbh.de</span>
+  </div>
+  <h1 class="title">Probenahmeprotokoll – Raumluftmessung VOC</h1>
+  <p class="subtitle">Bestimmung flüchtiger organischer Verbindungen (VOC) in der Innenraumluft – Doppel-Tenax</p>
+  <div class="grid2">
+    <div>
+      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill hk-ag-name"></div>
+      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-ag-strasse"></div>
+      <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-ag-ort"></div>
+      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill hk-projnr"></div>
+    </div>
+    <div>
+      <div class="frow"><label class="lbl-w">Datum:</label><input type="date" class="fill" style="max-width:180px"></div>
+      <div class="frow"><label class="lbl-w">Uhrzeit:</label><input type="time" class="fill" style="max-width:140px"></div>
+      <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
+    </div>
+  </div>
+  <div class="headsub">
+    <div class="cap">Messobjekt</div>
+    <div class="grid2">
+      <div>
+        <div class="frow"><label class="lbl-w">Objekt / Bezeichnung:</label><input class="fill hk-obj-name"></div>
+        <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-obj-strasse"></div>
+      </div>
+      <div>
+        <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-obj-ort"></div>
+      </div>
+    </div>
+  </div>
+  <div class="headsub">
+    <div class="cap">Probenahme / Geräte</div>
+    <div class="grid2">
+      <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="Holbach BiVOC2V2"></div>
+      <div class="frow"><label class="lbl-w">Pumpen-Nr.:</label><input class="fill"></div>
+      <div class="frow"><label class="lbl-w">Sammelmedium:</label><input class="fill" value="Tenax (Doppel-Tenax)"></div>
+      <div class="frow"><label class="lbl-w">Fluss kalibriert:</label><input class="fill" placeholder="SL/min, geprüft am …"></div>
+    </div>
+  </div>
+  <div id="proben-voc"></div>
+  <div class="addbar no-print">
+    <button id="addProbeVoc" type="button">+ Probe hinzufügen</button>
+    <div class="hint">Vorgabe: 2 Tenax-Röhrchen parallel (Kanal 1 + 2), je 0,15 SL/min über 20 min = 3 SL. „+" zählt die Nummer aus dem letzten Namen hoch.</div>
+  </div>
+  <div class="sign">
+    <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
+    <div class="frow"><label class="lbl-w">Unterschrift:</label><input class="fill"></div>
+  </div>
+</div>
+
+<!-- ===================== RAUMLUFT FORMALDEHYD ===================== -->
+<div id="form-formaldehyd" class="screen sheet form" style="display:none">
+  <div class="brief">
+    <span class="firma">Grieseler GmbH</span><span>Mengeder Schulstr. 4, 44359 Dortmund</span>
+    <span>Tel. 0231 - 99 20 78 0</span><span>info@grieseler-gmbh.de</span>
+  </div>
+  <h1 class="title">Probenahmeprotokoll – Raumluftmessung Formaldehyd</h1>
+  <p class="subtitle">Bestimmung von Formaldehyd in der Innenraumluft – DNPH-Kartusche</p>
+  <div class="grid2">
+    <div>
+      <div class="frow"><label class="lbl-w">Auftraggeber:</label><input class="fill hk-ag-name"></div>
+      <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-ag-strasse"></div>
+      <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-ag-ort"></div>
+      <div class="frow"><label class="lbl-w">Projekt-Nr.:</label><input class="fill hk-projnr"></div>
+    </div>
+    <div>
+      <div class="frow"><label class="lbl-w">Datum:</label><input type="date" class="fill" style="max-width:180px"></div>
+      <div class="frow"><label class="lbl-w">Uhrzeit:</label><input type="time" class="fill" style="max-width:140px"></div>
+      <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
+    </div>
+  </div>
+  <div class="headsub">
+    <div class="cap">Messobjekt</div>
+    <div class="grid2">
+      <div>
+        <div class="frow"><label class="lbl-w">Objekt / Bezeichnung:</label><input class="fill hk-obj-name"></div>
+        <div class="frow"><label class="lbl-w">Straße:</label><input class="fill hk-obj-strasse"></div>
+      </div>
+      <div>
+        <div class="frow"><label class="lbl-w">PLZ, Ort:</label><input class="fill hk-obj-ort"></div>
+      </div>
+    </div>
+  </div>
+  <div class="headsub">
+    <div class="cap">Probenahme / Geräte</div>
+    <div class="grid2">
+      <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="Holbach BiVOC2V2"></div>
+      <div class="frow"><label class="lbl-w">Pumpen-Nr.:</label><input class="fill"></div>
+      <div class="frow"><label class="lbl-w">Sammelmedium:</label><input class="fill" value="DNPH-Kartusche"></div>
+      <div class="frow"><label class="lbl-w">Fluss kalibriert:</label><input class="fill" placeholder="SL/min, geprüft am …"></div>
+    </div>
+  </div>
+  <div id="proben-form"></div>
+  <div class="addbar no-print">
+    <button id="addProbeForm" type="button">+ Probe hinzufügen</button>
+    <div class="hint">Vorgabe: DNPH-Kartusche, 1 SL/min über 30 min = 30 SL. „+" zählt die Nummer aus dem letzten Namen hoch.</div>
   </div>
   <div class="sign">
     <div class="frow"><label class="lbl-w">Probenehmer:</label><input class="fill"></div>
@@ -958,6 +1077,43 @@
   </div>
 </template>
 
+<!-- Vorlage eines Probenblocks (Raumluft VOC) -->
+<template id="probe-voc-tpl">
+  <div class="probe">
+    <div class="phead">
+      <span class="ptag"><label>Probe:</label><input class="pname" value="VOC1"></span>
+      <button type="button" class="rm no-print">Entfernen</button>
+    </div>
+    <div class="frow"><label class="lbl-w">Entnahmeort / Etage / Bereich:</label><input class="fill"></div>
+    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="Holbach BiVOC2V2">
+      <label>Pumpen-Nr.:</label><input class="fill" style="max-width:150px"></div>
+    <div class="frow"><label class="lbl-w">Sammelmedium:</label><input class="fill" value="Tenax"></div>
+    <div class="frow"><label class="lbl-w">Röhrchen-Nr. Kanal 1:</label><input class="fill" style="max-width:150px">
+      <label>Kanal 2:</label><input class="fill" style="max-width:150px"></div>
+    <div class="frow"><label class="lbl-w">Volumenstrom:</label><input class="fill vstrom" value="0,15 SL/min" style="max-width:120px">
+      <label>Dauer Messung:</label><input class="fill dauer" value="20 min" style="max-width:110px"></div>
+    <div class="frow"><label class="lbl-w">Probevolumen (autom.):</label><input class="fill pvol" readonly></div>
+  </div>
+</template>
+
+<!-- Vorlage eines Probenblocks (Raumluft FA) -->
+<template id="probe-form-tpl">
+  <div class="probe">
+    <div class="phead">
+      <span class="ptag"><label>Probe:</label><input class="pname" value="FA1"></span>
+      <button type="button" class="rm no-print">Entfernen</button>
+    </div>
+    <div class="frow"><label class="lbl-w">Entnahmeort / Etage / Bereich:</label><input class="fill"></div>
+    <div class="frow"><label class="lbl-w">Pumpentyp:</label><input class="fill" value="Holbach BiVOC2V2">
+      <label>Pumpen-Nr.:</label><input class="fill" style="max-width:150px"></div>
+    <div class="frow"><label class="lbl-w">Sammelmedium:</label><input class="fill" value="DNPH-Kartusche"></div>
+    <div class="frow"><label class="lbl-w">Kartuschen-Nr.:</label><input class="fill" style="max-width:150px"></div>
+    <div class="frow"><label class="lbl-w">Volumenstrom:</label><input class="fill vstrom" value="1 SL/min" style="max-width:120px">
+      <label>Dauer Messung:</label><input class="fill dauer" value="30 min" style="max-width:110px"></div>
+    <div class="frow"><label class="lbl-w">Probevolumen (autom.):</label><input class="fill pvol" readonly></div>
+  </div>
+</template>
+
 <!-- Vorlage eines Probenblocks (Raumluft PCB) -->
 <template id="probe-pcb-tpl">
   <div class="probe">
@@ -1024,6 +1180,8 @@
   var forms    = { raumluft: document.getElementById('form-raumluft'),
                    pak: document.getElementById('form-pak'),
                    pcb: document.getElementById('form-pcb'),
+                   voc: document.getElementById('form-voc'),
+                   formaldehyd: document.getElementById('form-formaldehyd'),
                    schimmel: document.getElementById('form-schimmel'),
                    feststoff: document.getElementById('form-feststoff'),
                    treppe: document.getElementById('form-treppe') };
@@ -1035,9 +1193,11 @@
     var vs=node.querySelector('.vstrom'), da=node.querySelector('.dauer'), out=node.querySelector('.pvol');
     if(!vs||!da||!out) return;
     var f=parseNum(vs.value), d=parseNum(da.value);
+    if(/min/i.test(da.value)) d=d/60;           // Dauer in Minuten -> Stunden (ohne Einheit/h = Stunden)
+    var sl=/SL/.test(vs.value);                 // Soll-Liter (Holbach) -> Ergebnis in SL
     if(isFinite(f)&&isFinite(d)){
-      var liters=f*d*60, txt=fmt(liters)+' l';
-      if(liters>=1000) txt+=' ('+fmt(liters/1000)+' m³)';
+      var liters=f*d*60, txt=fmt(liters)+(sl?' SL':' l');
+      if(liters>=1000 && !sl) txt+=' ('+fmt(liters/1000)+' m³)';
       out.value=txt; out.setAttribute('value', txt);
     } else { out.value=''; }
   }
@@ -1076,6 +1236,28 @@
   var secRaumluft = makeProbeSection('proben', 'probe-tpl', 'addProbe');
   var secPak      = makeProbeSection('proben-pak', 'probe-pak-tpl', 'addProbePak');
   var secPcb      = makeProbeSection('proben-pcb', 'probe-pcb-tpl', 'addProbePcb');
+
+  /* ---------- PCB: Lang-/Kurzzeitmessung ---------- */
+  var PCB_ART={ lang:{vs:'3 l/min', da:'8 h',    txt:'3 l/min · 8 h = 1,44 m³'},
+                kurz:{vs:'4 l/min', da:'50 min', txt:'4 l/min · 50 min = 200 l · NWG ca. 15 ng/m³'} };
+  function pcbArt(){ var r=document.querySelector('#form-pcb .r-pcbart:checked'); return PCB_ART[r?r.value:'lang']; }
+  function pcbVorgabeText(){ var t=document.querySelector('#form-pcb .pcb-vorgabe'); if(t) t.textContent=pcbArt().txt; }
+  function pcbSetProbe(node){
+    var a=pcbArt(), vs=node.querySelector('.vstrom'), da=node.querySelector('.dauer');
+    vs.value=a.vs; vs.setAttribute('value',a.vs); da.value=a.da; da.setAttribute('value',a.da);
+    recalc(node); if(typeof ensureEcho==='function'){ ensureEcho(vs); ensureEcho(da); }
+  }
+  document.querySelectorAll('#form-pcb .r-pcbart').forEach(function(r){
+    r.addEventListener('change', function(){
+      pcbVorgabeText();
+      document.querySelectorAll('#proben-pcb .probe').forEach(pcbSetProbe);
+    });
+  });
+  document.getElementById('addProbePcb').addEventListener('click', function(){
+    var b=document.querySelectorAll('#proben-pcb .probe'); if(b.length) pcbSetProbe(b[b.length-1]);
+  });
+  var secVoc      = makeProbeSection('proben-voc', 'probe-voc-tpl', 'addProbeVoc');
+  var secForm     = makeProbeSection('proben-form', 'probe-form-tpl', 'addProbeForm');
 
   /* ---------- Schimmel: Messpunkte + optionale Referenz (je 3 Sub-Proben) ---------- */
   var secSchimmel = (function(){
@@ -1569,6 +1751,8 @@
     if(proto==='raumluft' && secRaumluft.count()===0){ secRaumluft.add(); }
     if(proto==='pak' && secPak.count()===0){ secPak.add(); }
     if(proto==='pcb' && secPcb.count()===0){ secPcb.add(); }
+    if(proto==='voc' && secVoc.count()===0){ secVoc.add(); }
+    if(proto==='formaldehyd' && secForm.count()===0){ secForm.add(); }
     if(proto==='schimmel'){ if(secSchimmel.count()===0 && !secSchimmel.hasReferenz()){ secSchimmel.add(); } }
     if(proto==='feststoff'){ buildFeststoff(); }
     if(proto==='treppe'){ buildGwTable(); if(traeumeEl.children.length===0){ addTraum(); } }
@@ -1613,7 +1797,9 @@
     suppressAutosave=true;
     if(proto==='raumluft'){ secRaumluft.add(); }
     if(proto==='pak'){ secPak.add(); }
-    if(proto==='pcb'){ secPcb.add(); }
+    if(proto==='pcb'){ var rl=form.querySelector('.r-pcbart[value="lang"]'); if(rl){ rl.checked=true; rl.setAttribute('checked',''); } pcbVorgabeText(); secPcb.add(); }
+    if(proto==='voc'){ secVoc.add(); }
+    if(proto==='formaldehyd'){ secForm.add(); }
     if(proto==='schimmel'){ secSchimmel.add(); }
     if(proto==='treppe'){ if(traeumeEl.children.length===0){ addTraum(); } }
     setTimeout(function(){ suppressAutosave=false; }, 300);
@@ -1768,7 +1954,7 @@
     return proto;
   }
   /* Anzeigename der Protokollart (fuer Dateinamen-Vorschlag) */
-  var PROTO_ART={ raumluft:'VDI 3492', pak:'PAK', pcb:'PCB', schimmel:'Schimmelpilz',
+  var PROTO_ART={ raumluft:'VDI 3492', pak:'PAK', pcb:'PCB', voc:'VOC', formaldehyd:'Formaldehyd', schimmel:'Schimmelpilz',
                   feststoff:'Feststoff', treppe:'Treppengeländer' };
   /* Kopf-Feld fuer den Namensvorschlag je Typ (Objekt bevorzugt) */
   function kopfFeldFuerName(proto){
@@ -1867,6 +2053,8 @@
   secRaumluft.wireExisting();
   secPak.wireExisting();
   secPcb.wireExisting();
+  secVoc.wireExisting();
+  secForm.wireExisting();
   secSchimmel.wireExisting();
   buildGwTable();
   wireExistingTraeume();
@@ -1886,10 +2074,37 @@
     }
   })();
 </script>
+<div id="updBar" class="no-print" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#1f4e79;color:#fff;padding:10px 14px;font-size:15px;text-align:center;box-shadow:0 -2px 6px rgba(0,0,0,.25)">
+  Neue Version verfügbar. <button id="updBtn" type="button" style="margin-left:10px;font-size:15px;padding:6px 14px">Neu laden</button>
+</div>
 <script>
-  if('serviceWorker' in navigator){
+  /* Service Worker + Update-Prüfung: beim Start, bei Rückkehr in den Vordergrund, stündlich */
+  document.getElementById('updBar').style.display='none';   // in gespeicherten Dateien nie sichtbar
+  if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){
+    var hatteController=!!navigator.serviceWorker.controller;
+    var swReg=null, letztePruefung=0;
+    function updatePruefen(){
+      if(!swReg || !navigator.onLine) return;
+      var jetzt=Date.now(); if(jetzt-letztePruefung<60000) return;   // max. 1x pro Minute
+      letztePruefung=jetzt;
+      swReg.update().catch(function(){});
+    }
+    function updateHinweis(){ document.getElementById('updBar').style.display='block'; }
+    navigator.serviceWorker.addEventListener('controllerchange', function(){
+      if(hatteController) updateHinweis();          // nicht bei Erstinstallation
+      hatteController=true;
+    });
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('service-worker.js').catch(function(e){ console.log('SW-Fehler:', e); });
+      navigator.serviceWorker.register('service-worker.js').then(function(reg){
+        swReg=reg; updatePruefen();
+      }).catch(function(e){ console.log('SW-Fehler:', e); });
+    });
+    document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible') updatePruefen(); });
+    window.addEventListener('online', updatePruefen);
+    setInterval(updatePruefen, 60*60*1000);
+    document.getElementById('updBtn').addEventListener('click', function(){
+      var neu=function(){ location.reload(); };
+      if(typeof guardedLeave==='function') guardedLeave(neu); else neu();
     });
   }
 </script>

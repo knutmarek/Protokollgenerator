@@ -1,5 +1,5 @@
 // ====== Cache-Version. Bei jeder Aktualisierung der App diese Zahl erhöhen! ======
-const CACHE = 'protokolle-v6';
+const CACHE = 'protokolle-v8';
 
 const ASSETS = [
   'index.html',
@@ -28,9 +28,41 @@ self.addEventListener('activate', function(e){
   self.clients.claim();
 });
 
-// Anfragen zuerst aus dem Cache bedienen (offline-fähig), sonst aus dem Netz
+// index.html / Seitenaufrufe: zuerst aus dem Netz (immer neueste Version), offline aus dem Cache.
+// Netz-Timeout 4 s, damit schlechter Empfang die App nicht blockiert.
+function istSeite(req){
+  return req.mode === 'navigate' || /\/(index\.html)?$/.test(new URL(req.url).pathname);
+}
+function netzZuerst(req){
+  return new Promise(function(resolve, reject){
+    var fertig=false;
+    var timer=setTimeout(function(){
+      if(fertig) return;
+      caches.match(req, {ignoreSearch:true}).then(function(hit){
+        if(hit && !fertig){ fertig=true; resolve(hit); }
+      });
+    }, 4000);
+    fetch(req.url, {cache:'no-store', credentials:'same-origin'}).then(function(resp){
+      if(resp && resp.ok){
+        var kopie=resp.clone();
+        caches.open(CACHE).then(function(c){ c.put('index.html', kopie); });
+      }
+      if(!fertig){ fertig=true; clearTimeout(timer); resolve(resp); }
+    }).catch(function(){
+      caches.match(req, {ignoreSearch:true}).then(function(hit){
+        return hit || caches.match('index.html');
+      }).then(function(hit){
+        if(!fertig){ fertig=true; clearTimeout(timer); hit ? resolve(hit) : reject(new Error('offline')); }
+      });
+    });
+  });
+}
+
 self.addEventListener('fetch', function(e){
   if(e.request.method !== 'GET') return;
+  if(new URL(e.request.url).origin !== self.location.origin) return;
+  if(istSeite(e.request)){ e.respondWith(netzZuerst(e.request)); return; }
+  // übrige Dateien (Icons, Manifest): zuerst aus dem Cache, sonst aus dem Netz
   e.respondWith(
     caches.match(e.request).then(function(hit){
       return hit || fetch(e.request).then(function(resp){
